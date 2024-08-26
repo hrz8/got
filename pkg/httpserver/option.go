@@ -10,7 +10,7 @@ type Option func(*Server)
 
 func Port(port uint16) Option {
 	return func(s *Server) {
-		s.server.Addr = net.JoinHostPort("", fmt.Sprintf("%d", port))
+		s.Server.Addr = net.JoinHostPort("", fmt.Sprintf("%d", port))
 	}
 }
 
@@ -22,25 +22,25 @@ func ShutdownTimeout(timeout time.Duration) Option {
 
 func ReadHeaderTimeout(timeout time.Duration) Option {
 	return func(s *Server) {
-		s.server.ReadHeaderTimeout = timeout
+		s.Server.ReadHeaderTimeout = timeout
 	}
 }
 
 func ReadTimeout(timeout time.Duration) Option {
 	return func(s *Server) {
-		s.server.ReadTimeout = timeout
+		s.Server.ReadTimeout = timeout
 	}
 }
 
 func WriteTimeout(timeout time.Duration) Option {
 	return func(s *Server) {
-		s.server.WriteTimeout = timeout
+		s.Server.WriteTimeout = timeout
 	}
 }
 
 func IdleTimeout(timeout time.Duration) Option {
 	return func(s *Server) {
-		s.server.IdleTimeout = timeout
+		s.Server.IdleTimeout = timeout
 	}
 }
 

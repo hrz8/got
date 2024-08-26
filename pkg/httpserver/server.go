@@ -11,7 +11,7 @@ import (
 )
 
 type Server struct {
-	server          *http.Server
+	Server          *http.Server
 	allowedOrigins  []string
 	allowedHeaders  []string
 	notify          chan error
@@ -43,7 +43,7 @@ func New(mux http.Handler, opts ...Option) *Server {
 	}
 
 	s := &Server{
-		server:          httpServer,
+		Server:          httpServer,
 		notify:          make(chan error, 1),
 		shutdownTimeout: defaultShutdownTimeout,
 	}
@@ -57,7 +57,7 @@ func New(mux http.Handler, opts ...Option) *Server {
 
 func (s *Server) Run() {
 	go func() {
-		s.notify <- s.server.ListenAndServe()
+		s.notify <- s.Server.ListenAndServe()
 		close(s.notify)
 	}()
 }
@@ -66,9 +66,9 @@ func (s *Server) Notify() <-chan error {
 	return s.notify
 }
 
-func (s *Server) Shutdown() error {
-	ctx, cancel := context.WithTimeout(context.Background(), s.shutdownTimeout)
+func (s *Server) Shutdown(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, s.shutdownTimeout)
 	defer cancel()
 
-	return s.server.Shutdown(ctx)
+	return s.Server.Shutdown(ctx)
 }

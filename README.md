@@ -27,3 +27,17 @@ go build -ldflags "-s -w" -o bin/got .
 # with .env
 export $(cat .env | xargs) && ./bin/got serve
 ```
+
+## exe
+
+### http
+```bash
+curl http://localhost:5101/healthz 
+curl -X POST http://localhost:5101/v1/greeter/hello -d '{"name": "john"}'
+```
+
+### grpc
+```bash
+grpcurl -plaintext localhost:5102 service.v1.Health/Check
+grpcurl -plaintext -d '{"name": "john"}' localhost:5102 service.v1.Greeter/SayHello
+```

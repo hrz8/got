@@ -28,6 +28,25 @@ go build -ldflags "-s -w" -o bin/got .
 export $(cat .env | xargs) && ./bin/got serve
 ```
 
+## dockerize
+
+### build
+```bash
+docker build -t got:1.0.0 .
+```
+
+### run
+```bash
+docker run -d \
+-e DATABASE_URL='postgresql://postgres:pass@localhost:5432/got' \
+-e DATABASE_URL_READER='postgresql://postgres:pass@localhost:5432/go' \
+-e DATABASE_NAME='got' \
+-e LOG_LEVEL='debug' \
+-p 5001:5101 \
+-p 5002:5102 \
+got:1.0.0
+```
+
 ## exe
 
 ### http

@@ -23,7 +23,6 @@ func NewServeCommand() *cobra.Command {
 		Short: "serve the server",
 		RunE:  serve,
 	}
-
 	return cmd
 }
 

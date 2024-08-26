@@ -16,6 +16,5 @@ func NewVersionCommand() *cobra.Command {
 			return nil
 		},
 	}
-
 	return cmd
 }

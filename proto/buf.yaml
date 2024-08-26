@@ -1,0 +1,4 @@
+version: v1
+name: buf.build/hrz8/got
+deps:
+  - buf.build/googleapis/googleapis:8bc2c51e08c447cd8886cdea48a73e14

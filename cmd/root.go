@@ -8,6 +8,5 @@ func NewRootCommand() *cobra.Command {
 		Short: "golang template",
 		Long:  "simple golang template",
 	}
-
 	return cmd
 }

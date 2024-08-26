@@ -36,7 +36,6 @@ func NewMigrateDownCommand() *cobra.Command {
 		RunE:  migrateDown,
 		Args:  cobra.NoArgs,
 	}
-
 	return cmd
 }
 
@@ -45,5 +44,5 @@ func migrateUp(cmd *cobra.Command, args []string) error {
 }
 
 func migrateDown(cmd *cobra.Command, args []string) error {
-	return nil
+	return storage.MigrateDown()
 }

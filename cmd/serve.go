@@ -23,8 +23,8 @@ func serve(cmd *cobra.Command, args []string) error {
 	c := container.NewContainer()
 
 	c.AddProviders(config.New, provider.LogLevel, logger.New, provider.NewDB, provider.NewGRPCClient)
-	c.AddServers(provider.NewHTTPServer, provider.NewGRPCServer)
-	c.AddInvokers(func(*httpserver.Server) {}, func(*grpcserver.Server) {})
+	c.AddServers(provider.NewHTTPServer, provider.NewProfilerServer, provider.NewGRPCServer)
+	c.AddInvokers(func(*httpserver.Server) {}, func(*grpcserver.Server) {}, func(*provider.ProfilerServer) {})
 	c.Run()
 
 	return nil

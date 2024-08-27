@@ -57,6 +57,6 @@ curl -X POST http://localhost:5101/v1/greeter/hello -d '{"name": "john"}'
 
 ### grpc
 ```bash
-grpcurl -plaintext localhost:5102 service.v1.Health/Check
-grpcurl -plaintext -d '{"name": "john"}' localhost:5102 service.v1.Greeter/SayHello
+grpcurl -plaintext localhost:5102 service.v1.HealthService/Check
+grpcurl -plaintext -d '{"name": "john"}' localhost:5102 service.v1.GreeterService/SayHello
 ```

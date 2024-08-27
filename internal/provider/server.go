@@ -18,16 +18,18 @@ import (
 	servicev1 "github.com/hrz8/got/pkg/pb/service/v1"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
+	grpchealth "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
 func registerGatewayHandlers(cli *grpc.ClientConn) (*runtime.ServeMux, error) {
-	mux := runtime.NewServeMux()
-	ctx := context.TODO()
-
-	if err := servicev1.RegisterHealthServiceHandler(ctx, mux, cli); err != nil {
-		return nil, err
+	healthClient := grpchealth.NewHealthClient(cli)
+	opts := []runtime.ServeMuxOption{
+		runtime.WithHealthzEndpoint(healthClient),
 	}
+	mux := runtime.NewServeMux(opts...)
+
+	ctx := context.TODO()
 	if err := servicev1.RegisterGreeterServiceHandler(ctx, mux, cli); err != nil {
 		return nil, err
 	}
@@ -88,8 +90,8 @@ func NewGRPCServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger) *
 		grpcserver.Port(cfg.GRPCPort),
 	)
 
-	servicev1.RegisterHealthServiceServer(grpcServer.Server, health.NewServer())
 	servicev1.RegisterGreeterServiceServer(grpcServer.Server, greeter.NewServer())
+	grpchealth.RegisterHealthServer(grpcServer.Server, health.NewServer())
 	reflection.Register(grpcServer.Server)
 
 	lc.Append(fx.Hook{

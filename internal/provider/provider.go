@@ -18,7 +18,7 @@ import (
 	"github.com/hrz8/got/pkg/grpcserver"
 	"github.com/hrz8/got/pkg/httpserver"
 	"github.com/hrz8/got/pkg/logger"
-	servicev1 "github.com/hrz8/got/pkg/pb/v1"
+	servicev1 "github.com/hrz8/got/pkg/pb/service/v1"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -57,13 +57,28 @@ func NewGRPCClient(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger) *
 	return cli
 }
 
+func registerGatewayHandlers(cli *grpc.ClientConn) (*runtime.ServeMux, error) {
+	mux := runtime.NewServeMux()
+	ctx := context.TODO()
+
+	if err := servicev1.RegisterHealthServiceHandler(ctx, mux, cli); err != nil {
+		return nil, err
+	}
+	if err := servicev1.RegisterGreeterServiceHandler(ctx, mux, cli); err != nil {
+		return nil, err
+	}
+
+	return mux, nil
+}
+
 func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, cliConn *grpc.ClientConn, logger *logger.Logger) *httpserver.Server {
 	logger.Info("registering http server", slog.Any("port", cfg.HTTPPort))
 
-	mux := runtime.NewServeMux()
-	ctx := context.Background()
-	servicev1.RegisterHealthHandler(ctx, mux, cliConn)
-	servicev1.RegisterGreeterHandler(ctx, mux, cliConn)
+	mux, err := registerGatewayHandlers(cliConn)
+	if err != nil {
+		logger.Error("error registering gateway", slog.String("err", err.Error()))
+		os.Exit(1)
+	}
 
 	httpServer := httpserver.New(
 		mux,
@@ -109,8 +124,8 @@ func NewGRPCServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger) *
 		grpcserver.Port(cfg.GRPCPort),
 	)
 
-	servicev1.RegisterHealthServer(grpcServer.Server, health.NewServer())
-	servicev1.RegisterGreeterServer(grpcServer.Server, greeter.NewServer())
+	servicev1.RegisterHealthServiceServer(grpcServer.Server, health.NewServer())
+	servicev1.RegisterGreeterServiceServer(grpcServer.Server, greeter.NewServer())
 	reflection.Register(grpcServer.Server)
 
 	lc.Append(fx.Hook{

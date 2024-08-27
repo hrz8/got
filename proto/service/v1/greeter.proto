@@ -3,18 +3,16 @@ package service.v1;
 
 import "google/api/annotations.proto";
 
-option go_package = "github.com/hrz8/got/pkg/pb/base/v1";
-
-message HelloRequest {
+message SayHelloRequest {
   string name = 1;
 }
 
-message HelloReply {
+message SayHelloResponse {
   string message = 1;
 }
 
-service Greeter {
-  rpc SayHello(HelloRequest) returns (HelloReply) {
+service GreeterService {
+  rpc SayHello(SayHelloRequest) returns (SayHelloResponse) {
     option (google.api.http) = {
       post: "/v1/greeter/hello"
       body: "*"

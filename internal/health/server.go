@@ -3,17 +3,17 @@ package health
 import (
 	"context"
 
-	servicev1 "github.com/hrz8/got/pkg/pb/v1"
+	servicev1 "github.com/hrz8/got/pkg/pb/service/v1"
 )
 
 type Server struct {
-	servicev1.UnimplementedHealthServer
+	servicev1.UnimplementedHealthServiceServer
 }
 
 func NewServer() *Server {
 	return &Server{}
 }
 
-func (s *Server) Check(ctx context.Context, in *servicev1.HealthRequest) (*servicev1.HealthResponse, error) {
-	return &servicev1.HealthResponse{Status: "OK"}, nil
+func (s *Server) Check(ctx context.Context, in *servicev1.CheckRequest) (*servicev1.CheckResponse, error) {
+	return &servicev1.CheckResponse{Status: "OK"}, nil
 }

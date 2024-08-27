@@ -1,0 +1,13 @@
+# For details on buf.yaml configuration, visit https://buf.build/docs/configuration/v2/buf-yaml
+version: v2
+modules:
+  - name: buf.build/hrz8/got
+    path: proto
+deps:
+  - buf.build/googleapis/googleapis:8bc2c51e08c447cd8886cdea48a73e14
+lint:
+  use:
+    - DEFAULT
+breaking:
+  use:
+    - FILE

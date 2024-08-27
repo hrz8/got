@@ -1,0 +1,16 @@
+syntax = "proto3";
+package service.v1;
+
+import "google/api/annotations.proto";
+
+message CheckRequest {}
+
+message CheckResponse {
+  string status = 1;
+}
+
+service HealthService {
+  rpc Check(CheckRequest) returns (CheckResponse) {
+    option (google.api.http) = {get: "/healthz"};
+  }
+}

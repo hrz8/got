@@ -3,7 +3,9 @@ package cmd
 import (
 	"github.com/hrz8/got/config"
 	"github.com/hrz8/got/internal/container"
+	Middleware "github.com/hrz8/got/internal/middleware"
 	"github.com/hrz8/got/internal/provider"
+	User "github.com/hrz8/got/internal/user"
 	"github.com/hrz8/got/pkg/grpcserver"
 	"github.com/hrz8/got/pkg/httpserver"
 	"github.com/hrz8/got/pkg/logger"
@@ -22,7 +24,19 @@ func NewServeCommand() *cobra.Command {
 func serve(cmd *cobra.Command, args []string) error {
 	c := container.NewContainer()
 
-	c.AddProviders(config.New, provider.LogLevel, logger.New, provider.NewDB, provider.NewGRPCClient)
+	c.AddModules(
+		User.Module,
+		Middleware.Module,
+	)
+	c.AddProviders(
+		config.New,
+		provider.LogLevel,
+		logger.New,
+		provider.NewGatewayMux,
+		provider.NewHTTPRouter,
+		provider.NewDB,
+		provider.NewGRPCClient,
+	)
 	c.AddServers(provider.NewHTTPServer, provider.NewProfilerServer, provider.NewGRPCServer)
 	c.AddInvokers(func(*httpserver.Server) {}, func(*grpcserver.Server) {}, func(*provider.ProfilerServer) {})
 	c.Run()

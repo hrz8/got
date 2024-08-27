@@ -20,6 +20,10 @@ type ProfilerServer struct {
 }
 
 func NewProfilerServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger) *ProfilerServer {
+	if !cfg.EnableProfiler {
+		return nil
+	}
+
 	logger.Info("registering pprof server", slog.Any("port", cfg.HTTPPort))
 
 	mux := http.NewServeMux()

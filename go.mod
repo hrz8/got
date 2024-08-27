@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/fatih/color v1.17.0
+	github.com/go-chi/chi/v5 v5.1.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pressly/goose/v3 v3.21.1

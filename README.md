@@ -52,11 +52,16 @@ got:1.0.0
 ### http
 ```bash
 curl http://localhost:5101/healthz 
-curl -X POST http://localhost:5101/v1/greeter/hello -d '{"name": "john"}'
+curl -X POST http://localhost:5101/v1/greeter/hello -H 'Content-Type: application/json' -d '{"name": "john"}'
+# chi router
+curl http://localhost:5101/v1/users -H 'X-Rest-Request: true'
+curl http://localhost:5101/v1/users  # will return 404 if no X-Rest-Request
+# extras gwmux
+curl curl http://localhost:5101/users/123
 ```
 
 ### grpc
 ```bash
 grpcurl -plaintext localhost:5102 grpc.health.v1.Health/Check
-grpcurl -plaintext -d '{"name": "john"}' localhost:5102 service.v1.GreeterService/SayHello
+grpcurl -plaintext -d '{"name": "John"}' localhost:5102 service.v1.GreeterService/SayHello
 ```

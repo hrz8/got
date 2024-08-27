@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/hrz8/got/config"
 	"github.com/hrz8/got/internal/greeter"
@@ -22,32 +23,29 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func registerGatewayHandlers(cli *grpc.ClientConn) (*runtime.ServeMux, error) {
-	healthClient := grpchealth.NewHealthClient(cli)
-	opts := []runtime.ServeMuxOption{
-		runtime.WithHealthzEndpoint(healthClient),
-	}
-	mux := runtime.NewServeMux(opts...)
-
-	ctx := context.TODO()
-	if err := servicev1.RegisterGreeterServiceHandler(ctx, mux, cli); err != nil {
-		return nil, err
-	}
-
-	return mux, nil
+type multiServer struct {
+	gwmux http.Handler
+	mux   http.Handler
 }
 
-func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, cliConn *grpc.ClientConn, logger *logger.Logger) *httpserver.Server {
+func (cs *multiServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("X-Rest-Request") == "true" {
+		cs.mux.ServeHTTP(w, r)
+		return
+	}
+	cs.gwmux.ServeHTTP(w, r)
+}
+
+func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger, cliConn *grpc.ClientConn, mux *chi.Mux, gwmux *runtime.ServeMux) *httpserver.Server {
 	logger.Info("registering http server", slog.Any("port", cfg.HTTPPort))
 
-	mux, err := registerGatewayHandlers(cliConn)
-	if err != nil {
-		logger.Error("error registering gateway", slog.String("err", err.Error()))
+	if gwmux == nil {
+		logger.Error("error registering gateway mux")
 		os.Exit(1)
 	}
 
 	httpServer := httpserver.New(
-		mux,
+		&multiServer{gwmux, mux},
 		httpserver.Port(cfg.HTTPPort),
 		httpserver.ShutdownTimeout(cfg.ShutdownTimeout),
 		httpserver.ReadHeaderTimeout(5*time.Second),

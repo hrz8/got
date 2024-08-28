@@ -51,13 +51,12 @@ got:1.0.0
 
 ### http
 ```bash
-curl http://localhost:5101/healthz 
+curl http://localhost:5101/api/healthz
 curl -X POST http://localhost:5101/v1/greeter/hello -H 'Content-Type: application/json' -d '{"name": "john"}'
 # chi router
-curl http://localhost:5101/v1/users -H 'X-Rest-Request: true'
-curl http://localhost:5101/v1/users  # will return 404 if no X-Rest-Request
+curl http://localhost:5101/v1/users
 # extras gwmux
-curl curl http://localhost:5101/users/123
+curl http://localhost:5101/api/users/123
 ```
 
 ### grpc

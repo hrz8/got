@@ -24,7 +24,7 @@ func NewProfilerServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logge
 		return nil
 	}
 
-	logger.Info("registering pprof server", slog.Any("port", cfg.HTTPPort))
+	logger.Info("registering pprof server", slog.Any("port", cfg.ProfilerPort))
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/debug/pprof/", pprof.Index)

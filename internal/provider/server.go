@@ -18,25 +18,11 @@ import (
 	"github.com/hrz8/got/pkg/logger"
 	servicev1 "github.com/hrz8/got/pkg/pb/service/v1"
 	"go.uber.org/fx"
-	"google.golang.org/grpc"
 	grpchealth "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
-type multiServer struct {
-	gwmux http.Handler
-	mux   http.Handler
-}
-
-func (cs *multiServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("X-Rest-Request") == "true" {
-		cs.mux.ServeHTTP(w, r)
-		return
-	}
-	cs.gwmux.ServeHTTP(w, r)
-}
-
-func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger, cliConn *grpc.ClientConn, mux *chi.Mux, gwmux *runtime.ServeMux) *httpserver.Server {
+func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger, mux *chi.Mux, gwmux *runtime.ServeMux) *httpserver.Server {
 	logger.Info("registering http server", slog.Any("port", cfg.HTTPPort))
 
 	if gwmux == nil {
@@ -44,8 +30,9 @@ func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger, c
 		os.Exit(1)
 	}
 
+	mux.Mount("/api", http.StripPrefix("/api", gwmux))
 	httpServer := httpserver.New(
-		&multiServer{gwmux, mux},
+		mux,
 		httpserver.Port(cfg.HTTPPort),
 		httpserver.ShutdownTimeout(cfg.ShutdownTimeout),
 		httpserver.ReadHeaderTimeout(5*time.Second),

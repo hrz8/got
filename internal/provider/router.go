@@ -50,7 +50,7 @@ func NewGatewayMux(
 		return nil
 	}
 
-	// extras
+	// extras routes
 	if err := mux.HandlePath("GET", "/users/{id}", user.Detail); err != nil {
 		return nil
 	}

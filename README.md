@@ -52,7 +52,7 @@ got:1.0.0
 ### http
 ```bash
 curl http://localhost:5101/api/healthz
-curl -X POST http://localhost:5101/v1/greeter/hello -H 'Content-Type: application/json' -d '{"name": "john"}'
+curl -X POST http://localhost:5101/api/v1/greeter/hello -H 'Content-Type: application/json' -d '{"name": "john"}'
 # chi router
 curl http://localhost:5101/v1/users
 # extras gwmux

@@ -37,8 +37,8 @@ func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger, m
 		httpserver.ShutdownTimeout(cfg.ShutdownTimeout),
 		httpserver.ReadHeaderTimeout(5*time.Second),
 		httpserver.ReadTimeout(10*time.Second),
-		httpserver.WriteTimeout(10*time.Second),
-		httpserver.IdleTimeout(15*time.Second),
+		httpserver.WriteTimeout(15*time.Second),
+		httpserver.IdleTimeout(180*time.Second),
 		httpserver.AllowedOrigins(cfg.AllowedOrigins),
 		httpserver.AllowedHeaders(cfg.AllowedHeaders),
 	)

@@ -15,7 +15,7 @@ type Config struct {
 	HTTPPort          uint16        `env:"HTTP_PORT,default=5101"`
 	GRPCPort          uint16        `env:"GRPC_PORT,default=5102"`
 	ProfilerPort      uint16        `env:"PROFILER_PORT,default=5103"`
-	ShutdownTimeout   time.Duration `env:"SHUTDOWN_TIMEOUT,default=5s"`
+	ShutdownTimeout   time.Duration `env:"SHUTDOWN_TIMEOUT,default=15s"`
 	LogLevel          string        `env:"LOG_LEVEL,default=warn"`
 	AllowedOrigins    []string      `env:"ALLOWED_ORIGINS,delimiter=,default=*"`
 	AllowedHeaders    []string      `env:"ALLOWED_HEADERS,delimiter=,default=*"`

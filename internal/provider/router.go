@@ -6,11 +6,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/hrz8/got/internal/greeter"
+	"github.com/hrz8/got/internal/health"
 	Middleware "github.com/hrz8/got/internal/middleware"
 	User "github.com/hrz8/got/internal/user"
 	servicev1 "github.com/hrz8/got/pkg/pb/service/v1"
 	"google.golang.org/grpc"
 	grpchealth "google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func NewHTTPRouter(
@@ -26,11 +30,6 @@ func NewHTTPRouter(
 	return r
 }
 
-type customRoute struct {
-	meth    string
-	pattern string
-}
-
 func NewGatewayMux(
 	cli *grpc.ClientConn,
 	middleware *Middleware.Handler,
@@ -39,6 +38,17 @@ func NewGatewayMux(
 	healthClient := grpchealth.NewHealthClient(cli)
 	opts := []runtime.ServeMuxOption{
 		runtime.WithHealthzEndpoint(healthClient), // healthz will not injected with middleware
+		runtime.WithMarshalerOption(
+			runtime.MIMEWildcard, &runtime.JSONPb{
+				MarshalOptions: protojson.MarshalOptions{
+					UseProtoNames:   true,
+					EmitUnpopulated: true,
+				},
+				UnmarshalOptions: protojson.UnmarshalOptions{
+					DiscardUnknown: true,
+				},
+			},
+		),
 		runtime.WithMiddlewares(middleware.Middleware1, middleware.Middleware2),
 	}
 
@@ -56,4 +66,10 @@ func NewGatewayMux(
 	}
 
 	return mux
+}
+
+func registerGRPCServers(server *grpc.Server) {
+	servicev1.RegisterGreeterServiceServer(server, greeter.NewServer())
+	grpchealth.RegisterHealthServer(server, health.NewServer())
+	reflection.Register(server)
 }

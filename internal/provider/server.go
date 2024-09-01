@@ -11,15 +11,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/hrz8/got/config"
-	"github.com/hrz8/got/internal/greeter"
-	"github.com/hrz8/got/internal/health"
 	"github.com/hrz8/got/pkg/grpcserver"
 	"github.com/hrz8/got/pkg/httpserver"
 	"github.com/hrz8/got/pkg/logger"
-	servicev1 "github.com/hrz8/got/pkg/pb/service/v1"
 	"go.uber.org/fx"
-	grpchealth "google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/grpc/reflection"
 )
 
 func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger, mux *chi.Mux, gwmux *runtime.ServeMux) *httpserver.Server {
@@ -71,13 +66,9 @@ func NewHTTPServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger, m
 func NewGRPCServer(lc fx.Lifecycle, cfg *config.Config, logger *logger.Logger) *grpcserver.Server {
 	logger.Info("registering grpc server", slog.Any("port", cfg.GRPCPort))
 
-	grpcServer := grpcserver.New(
-		grpcserver.Port(cfg.GRPCPort),
-	)
+	grpcServer := grpcserver.New(grpcserver.Port(cfg.GRPCPort))
 
-	servicev1.RegisterGreeterServiceServer(grpcServer.Server, greeter.NewServer())
-	grpchealth.RegisterHealthServer(grpcServer.Server, health.NewServer())
-	reflection.Register(grpcServer.Server)
+	registerGRPCServers(grpcServer.Server)
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

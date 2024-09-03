@@ -39,7 +39,8 @@ func NewGatewayMux(
 	opts := []runtime.ServeMuxOption{
 		runtime.WithHealthzEndpoint(healthClient), // healthz will not injected with middleware
 		runtime.WithMarshalerOption(
-			runtime.MIMEWildcard, &runtime.JSONPb{
+			runtime.MIMEWildcard,
+			&runtime.JSONPb{
 				MarshalOptions: protojson.MarshalOptions{
 					UseProtoNames:   true,
 					EmitUnpopulated: true,
